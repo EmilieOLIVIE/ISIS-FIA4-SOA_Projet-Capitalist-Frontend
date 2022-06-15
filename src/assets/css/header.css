@@ -1,0 +1,13 @@
+.header {
+    display: grid;
+    grid-template-columns: 25% 25% 30% 20%;
+    padding: 0 1em;
+}
+
+.multiplier {
+    min-width: 4em;
+}
+
+.headerTypo {
+    font-weight: bold;
+}

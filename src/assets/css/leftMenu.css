@@ -1,0 +1,16 @@
+.leftBar {
+    background-color: transparent; /* rgba(117, 190, 218, 0.5); */
+    padding: 1em 1em;
+}
+
+.leftBarButton {
+    margin: 1em;
+}
+
+.modal .modal-dialog {
+    max-width: 80%;
+}
+
+.angelIcon {
+    width: 5em;
+}
