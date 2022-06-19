@@ -20,7 +20,9 @@ export default ({ world, onResetWorld }: InvestorsProps) => {
             {world.angelbonus} % bonus per angel
         </div>
         <div className="text-center">
-            <Button disabled={false} onClick={onResetWorld}>{world.totalangels} angels to claim with Restart</Button>
+            <Button disabled={false} onClick={onResetWorld} variant="warning">
+                {Math.trunc(150 * Math.sqrt(world.score / Math.pow(10, 15)) - world.totalangels)} angels to claim with Restart
+            </Button>
         </div>
     </>)
 }

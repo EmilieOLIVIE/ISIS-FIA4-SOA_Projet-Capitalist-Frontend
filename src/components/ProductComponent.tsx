@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import ReactDOMServer from "react-dom/server";
-import { Badge, Button, Card, InputGroup, ProgressBar, Stack } from "react-bootstrap";
+import { Button, Card, InputGroup, ProgressBar, Stack } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 
 import { Product } from "../world";
@@ -8,10 +8,9 @@ import { LANCER_PRODUCTION } from "../services";
 
 import MyProgressbar from "./MyProgressbar";
 
-import { ReactComponent as Coin } from '../assets/images/coin.svg'
-import { calculateGeometricSequence, calculateGeometricSequenceSum, toastError, transform } from "../Util";
 import GLOBALS from "../Globals";
-import CustomProgressBar from "./CustomProgressBar";
+import { ReactComponent as Coin } from '../assets/images/coin.svg'
+import { calcGeometricSequenceNSum, getGeometricSequenceNTerm, toastError, transform } from "../Util";
 
 type ProductProps = {
     username: string
@@ -20,7 +19,6 @@ type ProductProps = {
     money: number
     onProductionDone: (qt: number, product: Product) => void
     onBuyProduct: (qt: number, product: Product) => void
-    saveProductTimeleft: (product: Product) => void
 }
 
 export default ({
@@ -30,29 +28,26 @@ export default ({
     onBuyProduct,
     multiplierIndex,
     money,
-    saveProductTimeleft
 }: ProductProps) => {
 
     const [lancerProduction] = useMutation(LANCER_PRODUCTION,
         {
             context: { headers: { "x-user": username } },
-            onError: (error): void => {
-                console.log(error)
-                //toastError()
-                // actions en cas d'erreur
-            }
+            onError: (error) => toastError(error.message)
         }
     )
 
     const [maxCanBuy, setMaxCanBuy] = useState(0)
     const [run, setRun] = useState(product.managerUnlocked)
     const [progress, setProgress] = useState(0)
-    const [timeleft, setTimeleft] = useState(product.timeleft)
 
-    if (product.lastupdate <= 0) {
+    if (!product.lastupdate) {
         product.lastupdate = Date.now()
     }
 
+    /**
+     * Update max of product user can buy on money change
+     */
     useEffect(() => {
         setMaxCanBuy(calcMaxCanBuy())
     }, [money, multiplierIndex])
@@ -63,7 +58,6 @@ export default ({
      * + timeleft > 0, product is being produced ; calculate time elapsed since last update
      * + timeleft < 0, product is done being produced ; update player's money 
      */
-    //15 lignes de code
     const calcScore = () => {
         if (product.timeleft !== 0 || product.managerUnlocked) {
             let nbOfProducts = 0
@@ -74,7 +68,7 @@ export default ({
                 nbOfProducts = 1
                 product.timeleft = 0
                 if (product.managerUnlocked) {
-                    nbOfProducts += time / product.vitesse
+                    nbOfProducts += Math.trunc(time / product.vitesse)
                     product.timeleft = product.vitesse - (time % product.vitesse)
                 }
                 onProductionDone(nbOfProducts, product)
@@ -87,71 +81,6 @@ export default ({
         }
     }
 
-    const calcScore2 = () => {
-        let elapsedTime = Date.now() - product.lastupdate //Calculate elapsed time since last update
-        let time = elapsedTime - product.timeleft
-        let nbOfProducts = 0
-        // if (time < 0) product.timeleft -= time
-        // else {
-        //     if (product.managerUnlocked) {
-        //         product.timeleft = 0
-        //         quantite = 1
-        //     } else {
-
-        //     }
-        // }
-
-        //If manager is unlocked
-        if (product.managerUnlocked) {
-            //Calculate number of products produced
-            nbOfProducts = Math.trunc(time / product.vitesse)
-            //Update product production time according to elapsed time
-            product.timeleft = product.vitesse - (time % product.vitesse)
-            //Elapsed time / speed products have been created
-        }
-        //If production time is not null, product is being produced
-        else if (product.timeleft !== 0) {
-            //If manager is not yet unlocked, only 1 product has been created
-            if (product.timeleft < 0) {
-                nbOfProducts = 1
-                product.timeleft = 0
-            } else {
-                product.timeleft -= elapsedTime
-            }
-        }
-        console.log(nbOfProducts)
-
-        if (nbOfProducts > 0) onProductionDone(nbOfProducts, product)
-
-
-        //time /= product.vitesse
-        //onProductionDone(product, qt)
-
-        product.lastupdate = Date.now()
-        // if (product.timeleft <= 0) {
-        //     product.timeleft = 0
-        //     setProgress(0)
-        // }
-        // else {
-        //     product.timeleft = Date.now() - product.lastupdate
-        //     //let newProgress = product.vitesse - product.timeleft
-        //     //setProgress(newProgress)
-        // }
-
-        // /*         product.timeleft =
-        //             product.timeleft <= 0 ?
-        //                 0
-        //                 : Date.now() - product.lastupdate
-        //  */
-        // product.lastupdate = Date.now()
-
-        // console.log(product.timeleft, progress)
-        // if (product.timeleft <= 0 && run) {
-        //     //&& product.managerUnlocked
-        //     //onProductionDone(product)
-        // }
-    }
-
     const savedCallback = useRef(calcScore)
 
     useEffect(() => savedCallback.current = calcScore)
@@ -159,52 +88,37 @@ export default ({
     useEffect(() => {
         let timer = setInterval(() => savedCallback.current(), 100)
         return function cleanup() {
-            saveProductTimeleft(product)
             if (timer) clearInterval(timer)
         }
     }, [])
 
     /**
      * Calculate maximum quantity of this product
-     * that player can buy
+     * the player can buy
      * @returns maxCanBuy
      */
-    const calcMaxCanBuy2 = () => {
-        let canBuy = true
-        let maxCanBuy = 1 //n
-        let u = calculateGeometricSequence(product.cout, product.croissance, product.quantite)
-        //CA BUG ICI
-        while (canBuy) {
-            u = u * product.croissance
-            if (money > u) {
-                maxCanBuy++
-            }
-            else canBuy = false
-        }
-        return maxCanBuy
-    }
-
     const calcMaxCanBuy = () => {
-        return Math.floor(Math.log(1 - (money * (1 - product.croissance)) / product.cout) / Math.log(product.croissance))
-        let maxCanBuy = 1
-        let cost = calculateGeometricSequenceSum(product.cout, 1 - product.croissance, maxCanBuy)
-
-        while (money > cost) {
-            maxCanBuy++
-            cost = calculateGeometricSequenceSum(product.cout, 1 - product.croissance, maxCanBuy)
+        let n = 1
+        let cost = product.cout
+        while (cost < money) {
+            n++
+            cost = calcGeometricSequenceNSum(product.cout, product.croissance, n)
         }
 
-        return maxCanBuy
+        return n - 1
     }
 
+    /**
+     * Calculate the cost of [multiplier] products
+     * @returns productCost
+     */
     const calcProductCost = () => {
         let quantity = getQuantityToBuy()
-        return calculateGeometricSequenceSum(product.cout, product.croissance, quantity)
+        return calcGeometricSequenceNSum(product.cout, product.croissance, quantity)
     }
 
     /**
      * Start product production
-     * @param event 
      */
     const startProduction = () => {
         if (product.timeleft === 0) {
@@ -225,11 +139,11 @@ export default ({
 
     /**
      * Ascertain quantity of product to buy
+     * according to selected multiplier
      * @returns quantityToBuy
      */
     const getQuantityToBuy = () => {
         switch (multiplierIndex) {
-            //A ameliorer
             case 0:
                 return 1
             case 1:
@@ -237,22 +151,33 @@ export default ({
             case 2:
                 return maxCanBuy
             default:
-                let nextPalier = getNextPalier()
-                return nextPalier ? nextPalier.seuil - product.quantite : 0
-        }
-    }
-
-    const getNextPalier = () => {
-        for (let i = 0; i < product.paliers.length; i++) {
-            if (!product.paliers[i].unlocked) return product.paliers[i]
+                //Find next level to unlock
+                let nextLevel = product.paliers.find(palier => !palier.unlocked)
+                return nextLevel ? nextLevel.seuil - product.quantite : 0
         }
     }
 
     /**
-     * 
+     * Get product progression on to next reachable level.
+     * If no more level to unlock, progression is 100%
+     * @returns Progress bar progression
      */
-    const canBuyProduct = () => {
-        return money >= calcProductCost()
+    const getProgressionToNextLevel = () => {
+        let nextLevelIndex = product.paliers.findIndex(palier => !palier.unlocked)
+        if (nextLevelIndex === -1) return 100
+        else if (nextLevelIndex === 0) return product.quantite * 100 / product.paliers[nextLevelIndex].seuil
+        else return product.paliers[nextLevelIndex].seuil - product.quantite * 100 / (product.paliers[nextLevelIndex].seuil - product.paliers[nextLevelIndex - 1].seuil)
+    }
+
+    /**
+     * Format product timeleft to display
+     * @param timeleft 
+     * @returns Displayable time
+     */
+    const formatTimeLeft = (timeleft: number) => {
+        let date = new Date(0);
+        date.setSeconds(0, timeleft);
+        return date.toISOString().substr(11, 8);
     }
 
     return (
@@ -266,7 +191,7 @@ export default ({
                         style={{ backgroundImage: `url(${GLOBALS.SERVER}${product.logo})`, backgroundSize: "100% 100%" }}
                         onClick={startProduction}
                     />
-                    <Badge pill className="overlap" bg="dark">{product.quantite}</Badge>
+                    <ProgressBar className="overlap" variant="warning" now={getProgressionToNextLevel()} label={product.quantite} />
                 </div>
                 <div className='flex-grow-1'>
                     <Stack gap={2}>
@@ -274,7 +199,7 @@ export default ({
                             <MyProgressbar
                                 className="bar"
                                 vitesse={product.vitesse}
-                                initialvalue={product.vitesse - product.timeleft}
+                                initialvalue={product.timeleft !== 0 && product.vitesse < 500 ? product.vitesse : product.vitesse - product.timeleft}
                                 run={run}
                                 frontcolor="#ff8800"
                                 backcolor="#ffffff"
@@ -290,7 +215,7 @@ export default ({
                                 variant="warning"
                                 className="flex-grow-1 d-flex justify-content-between"
                                 onClick={() => onBuyProduct(getQuantityToBuy(), product)}
-                                disabled={!canBuyProduct()}>
+                                disabled={money < calcProductCost() || getQuantityToBuy() === 0}>
                                 <span>
                                     x{getQuantityToBuy()}
                                 </span>
@@ -301,7 +226,9 @@ export default ({
                                 ` }}>
                                 </span>
                             </Button>
-                            <input type="time" disabled value={Date.now() - product.lastupdate} />
+                            <InputGroup.Text className="productTimeleft">
+                                {formatTimeLeft(product.timeleft > 0 ? product.timeleft : 0)}
+                            </InputGroup.Text>
                         </InputGroup>
                     </Stack>
                 </div>
@@ -309,15 +236,3 @@ export default ({
         </Card>
     )
 }
-
-
-/*
-                    <ProgressBar now={Math.round(((product.vitesse - product.timeleft) / product.vitesse) * 100)} min={0} max={100} />
-                        <CustomProgressBar
-                            vitesse={product.vitesse}
-                            initialvalue={product.vitesse - product.timeleft}
-                            run={run}
-                            auto={product.managerUnlocked}
-                            onCompleted={() => null}
-                        />
-*/

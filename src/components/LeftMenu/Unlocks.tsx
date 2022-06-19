@@ -1,9 +1,11 @@
-import { Button, Col, Row } from "react-bootstrap"
+import { useState } from "react"
 
 import { World } from "../../world"
 
+import ModalTemplate from "./Common/ModalTemplate"
+import ModalNav from "./Common/ModalNav"
+
 import GLOBALS from '../../Globals'
-import ModalTemplate from "./ModalTemplate"
 
 type unlocksProps = {
     world: World
@@ -11,12 +13,18 @@ type unlocksProps = {
 
 export default ({ world }: unlocksProps) => {
 
+    const [showUnlocked, setShowUnlocked] = useState(false)
+
+    /**
+     * Retrieve both product and global unlocks
+     * @returns {Palier[]}
+     */
     const getUnlocks = () => {
         let allPaliers = world.products.flatMap(product => product.paliers)
         let unlocks = []
         world.products
             .forEach(product => {
-                let palier = allPaliers.find(palier => !palier.unlocked && palier.idcible === product.id)
+                let palier = allPaliers.find(palier => palier.unlocked === showUnlocked && palier.idcible === product.id)
                 if (palier) unlocks.push(palier)
             }
             )
@@ -25,16 +33,20 @@ export default ({ world }: unlocksProps) => {
         return unlocks
     }
 
-    return (<>
-        {
-            getUnlocks().map(
-                unlock =>
-                (<ModalTemplate
-                    palier={unlock}
-                    typePalier={GLOBALS.MAIN_MODALS.UNLOCKS}
-                    nameCible={unlock.idcible === 0 ? "All" : world.products[unlock.idcible - 1].name}
-                />)
-            )
-        }
-    </>)
+    return (
+        <>
+            <ModalNav onSelectKey={(showUnlocked) => setShowUnlocked(showUnlocked)} />
+            {
+                getUnlocks().map(
+                    unlock =>
+                    (<ModalTemplate
+                        palier={unlock}
+                        typePalier={GLOBALS.MAIN_MODALS.UNLOCKS}
+                        hideBuyButton={showUnlocked}
+                        nameCible={unlock.idcible === 0 ? "All" : world.products[unlock.idcible - 1].name}
+                    />)
+                )
+            }
+        </>
+    )
 }

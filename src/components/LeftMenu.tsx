@@ -1,26 +1,28 @@
 import { useState } from 'react'
 import { Button, Col, Container, Modal, Row } from 'react-bootstrap'
 import Badge from '@mui/material/Badge';
-import { Palier, Product, World } from '../world'
+
+import { World } from '../world'
 
 import Unlocks from './LeftMenu/Unlocks'
 import CashUpgrades from './LeftMenu/CashUpgrades'
 import AngelUpgrades from './LeftMenu/AngelUpgrades'
 import Managers from './LeftMenu/Managers'
 import Investors from './LeftMenu/Investors'
+
 import GLOBALS from '../Globals'
 
 type LeftMenuProps = {
     world: World
     username: String
-    updateWorld: (world: World) => void    
+    updateWorld: (world: World) => void
     onResetWorld: () => void
 }
 
 export type ModalProps = {
-        world: World
-        username: String
-        updateWorld: (world: World) => void
+    world: World
+    username: String
+    updateWorld: (world: World) => void
 }
 
 export default ({ world, username, updateWorld, onResetWorld }: LeftMenuProps) => {
@@ -51,11 +53,11 @@ export default ({ world, username, updateWorld, onResetWorld }: LeftMenuProps) =
             case GLOBALS.MAIN_MODALS.CASH_UPGRADES:
                 return world.upgrades.filter(upgrade => !upgrade.unlocked && upgrade.seuil <= world.money).length
             case GLOBALS.MAIN_MODALS.ANGEL_UPGRADES:
-                return world.angelupgrades.filter(upgrade => !upgrade.unlocked && upgrade.seuil <= world.money).length
+                return world.angelupgrades.filter(upgrade => !upgrade.unlocked && upgrade.seuil <= world.activeangels).length
             case GLOBALS.MAIN_MODALS.MANAGERS:
                 return world.managers.filter(manager => !manager.unlocked && manager.seuil <= world.money).length
             case GLOBALS.MAIN_MODALS.INVESTORS:
-                return " "
+                return Math.trunc(150 * Math.sqrt(world.score / Math.pow(10, 15)) - world.totalangels)
             default:
                 return 0
         }
@@ -66,8 +68,8 @@ export default ({ world, username, updateWorld, onResetWorld }: LeftMenuProps) =
             {Object.values(GLOBALS.MAIN_MODALS)
                 .filter(value => value !== GLOBALS.MAIN_MODALS.NONE)
                 .map(value => (
-                    <Row>
-                        <Col>
+                    <Row key={value + -'row'}>
+                        <Col key={value + '-col'}>
                             <Badge className="leftBarButton" color="warning" badgeContent={calcNumberCanBuy(value)}>
                                 <Button
                                     variant="dark"

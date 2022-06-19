@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react"
+import { useEffect, useRef } from "react"
 
 export enum Orientation {
   horizontal = "horizontal",
@@ -18,13 +18,11 @@ type BarProps = {
 }
 
 export default function MyProgressbar({
-    vitesse, initialvalue = 0, className, run, frontcolor = "#008800", backcolor = "#FFFFFF", auto = false, onCompleted, orientation = Orientation.horizontal
+  vitesse, initialvalue = 0, className, run, frontcolor = "#008800", backcolor = "#FFFFFF", auto = false, onCompleted, orientation = Orientation.horizontal
 }: BarProps) {
 
-  console.log('initial value', initialvalue)
-
   const requestIdRef = useRef(0)
-  const canvasRef = useRef<HTMLCanvasElement>( null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const widthRef = useRef(0)
   const dateRef = useRef(Date.now() - initialvalue)
 
@@ -51,11 +49,11 @@ export default function MyProgressbar({
 
   function fill(ctx: CanvasRenderingContext2D) {
     if (!canvasRef.current || !widthRef.current) return
-    let width =  canvasRef.current.width
+    let width = canvasRef.current.width
     let height = canvasRef.current.height
     ctx.fillStyle = frontcolor
     if (orientation === Orientation.horizontal) {
-      ctx.fillRect(0,0, widthRef.current, height);
+      ctx.fillRect(0, 0, widthRef.current, height);
     }
     else {
       ctx.fillRect(0, height - widthRef.current, width, height);
@@ -67,16 +65,16 @@ export default function MyProgressbar({
     const width = canvasRef.current.width
     const height = canvasRef.current.height
     ctx.fillStyle = backcolor
-    ctx.fillRect(0,0, width, height)
+    ctx.fillRect(0, 0, width, height)
     widthRef.current = 0
   }
 
   function draw() {
     if (!canvasRef.current) return
     if (widthRef.current < canvasRef.current.width || auto) {
-        renderFrame()
-        requestIdRef.current = requestAnimationFrame(draw)
-      }
+      renderFrame()
+      requestIdRef.current = requestAnimationFrame(draw)
+    }
   }
 
   useEffect(() => {
@@ -100,6 +98,6 @@ export default function MyProgressbar({
   })
 
   return (
-      <canvas className={className} ref={canvasRef}/>
+    <canvas className={className} ref={canvasRef} />
   )
 }

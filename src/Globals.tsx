@@ -1,12 +1,5 @@
 const GLOBALS = {
-/*     multiplier: {
-        '1': 'x1',
-        '10': 'x10',
-        '0': 'Max',
-        '-1': 'Next',
-    }
- */
-    SERVER: 'http://localhost:4000/', //A passer en variable d'environnement
+    SERVER: 'http://localhost:4000/',
     MULTIPLIER: ['x1', 'x10', 'Max', 'Next'],
     MAIN_MODALS: {
         UNLOCKS: 'Unlocks',

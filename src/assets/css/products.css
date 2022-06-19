@@ -44,8 +44,16 @@
 .progressBar .bar {
     width: inherit;
     height: inherit;
+/*Override Boostrap ProgressBar CSS*/
+.progress-bar {
+    color: black;
 }
 
 .coinIcon {
     width: 1em;
+}
+
+.productTimeleft {
+    pointer-events: none;
+    width: fit-content !important;
 }

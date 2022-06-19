@@ -47,7 +47,10 @@ export default ({
                             Player ID : &nbsp;
                             <input type="text"
                                 defaultValue={username}
-                                onBlur={onUsernameChanged}
+                                onBlur={onUsernameChanged} //Blurring input changes username
+                                onKeyDown={event => {
+                                    if(event.key === "Enter") onUsernameChanged(event) //Pressing Enter changes username
+                                }}
                             />
                         </Typography>
                     </Box>

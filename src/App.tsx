@@ -1,16 +1,20 @@
+//Imports from external sources
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { useMutation, useQuery } from "@apollo/client";
 
+//Import css
 import 'react-toastify/dist/ReactToastify.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./assets/css/master.css";
 import "./App.css";
 
+//Import components
 import Main from "./components/Main";
 
+//Import utils
 import { GET_WORLD, RESET_WORLD } from "./services";
-import { Product } from "./world";
+import { toastError } from "./Util";
 
 function App() {
   const generateUsername = () => {
@@ -28,13 +32,9 @@ function App() {
 
   const [resetWorld] = useMutation(RESET_WORLD,
     {
-      context: {
-        headers: { "x-user": username }
-      },
-      onError: (error): void => {
-        // actions en cas d'erreur
-      },
-      onCompleted: (data) => refetchWorld()
+      context: { headers: { "x-user": username } },
+      onError: (error) => toastError(error.message),
+      onCompleted: (data) => refetchWorld() //Reload world on reset
     }
   )
 
@@ -55,6 +55,7 @@ function App() {
   if (loading) corps = <div> Loading... </div>
   else if (error) corps = <div> Erreur de chargement du monde ! </div>
   else corps = <Main
+    key={username}
     loadedWorld={data.getWorld}
     username={username}
     onUsernameChanged={onUsernameChanged}

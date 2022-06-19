@@ -1,4 +1,6 @@
 import { toast } from "react-toastify";
+import GLOBALS from "./Globals";
+import { Palier, Product } from "./world";
 
 export function transform(valeur: number): string {
     let res: string = "";
@@ -11,17 +13,25 @@ export function transform(valeur: number): string {
     return res;
 };
 
-export function calculateGeometricSequence(startValue: number, ratio: number, n: number): number {
-    for (let i = 1; i < n; i++) {
-        startValue = startValue * ratio
-    }
-    return startValue
+export function getGeometricSequenceNTerm(a0: number, q: number, n: number): number {
+    return a0 * Math.pow(q, n - 1)
 }
 
-export function calculateGeometricSequenceSum(startValue: number, ratio: number, n: number): number {
-    return startValue * (1 - Math.pow(ratio, n)) / (1 - ratio)
+export function calcGeometricSequenceNSum(a0: number, q: number, n: number): number {
+    return (a0 - getGeometricSequenceNTerm(a0, q, n) * q) / (1 - q)
 }
 
+export function updateProduct(product: Product, upgrade: Palier) {
+    if (upgrade.typeratio === GLOBALS.TYPE_RATIO.GAIN) product.revenu *= upgrade.ratio
+    else if (upgrade.typeratio === GLOBALS.TYPE_RATIO.VITESSE) product.vitesse /= upgrade.ratio
+    else if (upgrade.typeratio === GLOBALS.TYPE_RATIO.ANGE) console.log("angel")
+    return product
+}
+
+export function formatPhrase(upgrade: Palier) {
+    let phrase = <>{upgrade.name} <hr /> x{upgrade.ratio} {upgrade.typeratio}</>
+    return phrase
+}
 
 export function customToast(message: string | JSX.Element) {
     return toast(

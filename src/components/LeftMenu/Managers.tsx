@@ -1,16 +1,23 @@
+import { useState } from "react"
 import { useMutation } from "@apollo/client"
 
-import GLOBALS from "../../Globals"
-import ENGAGER_MANAGER from "../../services/engagerManager"
-import { toastError, toastSuccess } from "../../Util"
-
 import { Palier } from "../../world"
+import { ENGAGER_MANAGER } from "../../services"
+
+import ModalTemplate from "./Common/ModalTemplate"
+import ModalNav from "./Common/ModalNav"
 import { ModalProps } from "../LeftMenu"
 
-import ModalTemplate from "./ModalTemplate"
+import GLOBALS from "../../Globals"
+import { toastError, toastSuccess } from "../../Util"
 
 export default ({ world, username, updateWorld }: ModalProps) => {
 
+    const [showUnlocked, setShowUnlocked] = useState(false)
+
+    /**
+     * Call backend function to buy given manager
+     */
     const [engagerManager] = useMutation(ENGAGER_MANAGER,
         {
             context: { headers: { "x-user": username } },
@@ -19,6 +26,11 @@ export default ({ world, username, updateWorld }: ModalProps) => {
         }
     )
 
+    /**
+     * Unlock the manager and update user money
+     * then prompt parent to update the world
+     * @param manager 
+     */
     const hireManager = (manager: Palier) => {
         if (world.money >= manager.seuil) {
             let newManager = world.managers.find(element => element.name === manager.name)
@@ -31,19 +43,23 @@ export default ({ world, username, updateWorld }: ModalProps) => {
         }
     }
 
-    return (<>
-        {
-            world.managers.filter(manager => !manager.unlocked).map(
-                manager =>
-                (<ModalTemplate
-                    palier={manager}
-                    nameCible={world.products[manager.idcible - 1].name}
-                    typePalier={GLOBALS.MAIN_MODALS.MANAGERS}
-                    buyDisabled={world.money < manager.seuil}
-                    onClickBuy={() => engagerManager({ variables: { name: manager.name } })}
-                />)
+    return (
+        <>
+            <ModalNav onSelectKey={(isUnlocked) => setShowUnlocked(isUnlocked)} />
+            {
+                world.managers.filter(manager => manager.unlocked === showUnlocked).map(
+                    manager =>
+                    (<ModalTemplate
+                        palier={manager}
+                        nameCible={world.products[manager.idcible - 1].name}
+                        typePalier={GLOBALS.MAIN_MODALS.MANAGERS}
+                        buyDisabled={world.money < manager.seuil || world.products[manager.idcible - 1].quantite === 0}
+                        hideBuyButton={showUnlocked}
+                        onClickBuy={() => engagerManager({ variables: { name: manager.name } })}
+                    />)
 
-            )
-        }
-    </>)
+                )
+            }
+        </>
+    )
 }
