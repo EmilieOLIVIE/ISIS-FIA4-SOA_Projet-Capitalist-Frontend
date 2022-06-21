@@ -50,6 +50,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
                 world.managers.filter(manager => manager.unlocked === showUnlocked).map(
                     manager =>
                     (<ModalTemplate
+                        key={manager.name}
                         palier={manager}
                         nameCible={world.products[manager.idcible - 1].name}
                         typePalier={GLOBALS.MAIN_MODALS.MANAGERS}

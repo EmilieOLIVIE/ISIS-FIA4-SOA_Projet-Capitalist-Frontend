@@ -40,6 +40,7 @@ export default ({ world }: unlocksProps) => {
                 getUnlocks().map(
                     unlock =>
                     (<ModalTemplate
+                        key={unlock.name}
                         palier={unlock}
                         typePalier={GLOBALS.MAIN_MODALS.UNLOCKS}
                         hideBuyButton={showUnlocked}

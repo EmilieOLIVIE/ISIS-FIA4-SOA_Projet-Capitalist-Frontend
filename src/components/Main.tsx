@@ -36,9 +36,7 @@ export default ({
      * Update saved state when loaded world changes
      */
     useEffect(() => {
-        console.log("update loaded world")
-        setWorld(JSON.parse(JSON.stringify(loadedWorld)) as
-            World)
+        setWorld(JSON.parse(JSON.stringify(loadedWorld)) as World)
     }, [loadedWorld])
 
     const [multiplierIndex, setMultiplierIndex] = useState(0)
@@ -89,6 +87,7 @@ export default ({
         product.quantite += qt
         product.cout = getGeometricSequenceNTerm(product.cout, product.croissance, qt + 1)
 
+        //Check if product has reached a new internal level
         product.paliers.forEach(level => {
             if (!level.unlocked && product.quantite >= level.seuil) {
                 //Unlock new level
@@ -98,14 +97,18 @@ export default ({
             }
         })
 
+        //Check if product has reached a new global level
         world.allunlocks.forEach(level => {
             if (!level.unlocked) {
                 //Check that all products have reached unlock threshold
-                if (world.products.every(product => product.quantite >= level.seuil))
+                if (world.products.every(product => product.quantite >= level.seuil)) {
+                    level.unlocked = true
                     //If so, update all products
                     world.products.forEach(product => {
                         product = updateProduct(product, level)
                     })
+                    customToast(formatPhrase(level))
+                }
             }
         })
 
@@ -139,7 +142,7 @@ export default ({
                             product={product}
                             onProductionDone={updateMoney}
                             multiplierIndex={multiplierIndex}
-                            money={world.money}
+                            world={world}
                             onBuyProduct={buyProduct}
                         />
                     ))}

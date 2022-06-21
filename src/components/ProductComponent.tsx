@@ -3,7 +3,7 @@ import ReactDOMServer from "react-dom/server";
 import { Button, Card, InputGroup, ProgressBar, Stack } from "react-bootstrap";
 import { useMutation } from "@apollo/client";
 
-import { Product } from "../world";
+import { Product, World } from "../world";
 import { LANCER_PRODUCTION } from "../services";
 
 import MyProgressbar from "./MyProgressbar";
@@ -14,9 +14,9 @@ import { calcGeometricSequenceNSum, getGeometricSequenceNTerm, toastError, trans
 
 type ProductProps = {
     username: string
-    product: Product,
+    product: Product
     multiplierIndex: number
-    money: number
+    world: World
     onProductionDone: (qt: number, product: Product) => void
     onBuyProduct: (qt: number, product: Product) => void
 }
@@ -27,7 +27,7 @@ export default ({
     onProductionDone,
     onBuyProduct,
     multiplierIndex,
-    money,
+    world,
 }: ProductProps) => {
 
     const [lancerProduction] = useMutation(LANCER_PRODUCTION,
@@ -46,17 +46,17 @@ export default ({
     }
 
     /**
-     * Update max of product user can buy on money change
+     * Update max of product user can buy on world.money change
      */
     useEffect(() => {
         setMaxCanBuy(calcMaxCanBuy())
-    }, [money, multiplierIndex])
+    }, [world.money, multiplierIndex])
 
     /**
      * Calculate score depending on the product state of production :
      * + timeleft = 0, product is not being produced
      * + timeleft > 0, product is being produced ; calculate time elapsed since last update
-     * + timeleft < 0, product is done being produced ; update player's money 
+     * + timeleft < 0, product is done being produced ; update player's world.money 
      */
     const calcScore = () => {
         if (product.timeleft !== 0 || product.managerUnlocked) {
@@ -100,7 +100,7 @@ export default ({
     const calcMaxCanBuy = () => {
         let n = 1
         let cost = product.cout
-        while (cost < money) {
+        while (cost < world.money) {
             n++
             cost = calcGeometricSequenceNSum(product.cout, product.croissance, n)
         }
@@ -207,7 +207,7 @@ export default ({
                                 onCompleted={onProgressbarCompleted}
                             />
                             <span className="overlap text-dark text-center">
-                                {product.revenu * product.quantite}
+                                {transform(product.revenu * product.quantite * (1 + world.angelbonus * world.activeangels / 100))}
                             </span>
                         </div>
                         <InputGroup style={{ width: 'inherit' }}>
@@ -215,7 +215,7 @@ export default ({
                                 variant="warning"
                                 className="flex-grow-1 d-flex justify-content-between"
                                 onClick={() => onBuyProduct(getQuantityToBuy(), product)}
-                                disabled={money < calcProductCost() || getQuantityToBuy() === 0}>
+                                disabled={world.money < calcProductCost() || getQuantityToBuy() === 0}>
                                 <span>
                                     x{getQuantityToBuy()}
                                 </span>

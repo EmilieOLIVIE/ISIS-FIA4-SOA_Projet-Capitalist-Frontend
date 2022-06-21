@@ -51,10 +51,10 @@ function App() {
     setUsername(event.target.value)
   }
 
-  let corps = undefined
-  if (loading) corps = <div> Loading... </div>
-  else if (error) corps = <div> Erreur de chargement du monde ! </div>
-  else corps = <Main
+  let body = undefined
+  if (loading) body = <div> Loading... </div>
+  else if (error) body = <div> Erreur de chargement du monde ! </div>
+  else body = <Main
     key={username}
     loadedWorld={data.getWorld}
     username={username}
@@ -65,31 +65,10 @@ function App() {
   return (
     <div className="App">
       <ToastContainer theme="dark" />
-      {corps}
+      {body}
     </div>
   );
 }
 
 
 export default App;
-
-/*
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-*/

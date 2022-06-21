@@ -58,6 +58,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
                 world.upgrades.filter(upgrade => upgrade.unlocked === showUnlocked).map(
                     upgrade =>
                     (<ModalTemplate
+                        key={upgrade.name}
                         palier={upgrade}
                         typePalier={GLOBALS.MAIN_MODALS.CASH_UPGRADES}
                         nameCible={world.products[upgrade.idcible - 1].name}

@@ -55,7 +55,10 @@ export default ({ world, username, updateWorld, onResetWorld }: LeftMenuProps) =
             case GLOBALS.MAIN_MODALS.ANGEL_UPGRADES:
                 return world.angelupgrades.filter(upgrade => !upgrade.unlocked && upgrade.seuil <= world.activeangels).length
             case GLOBALS.MAIN_MODALS.MANAGERS:
-                return world.managers.filter(manager => !manager.unlocked && manager.seuil <= world.money).length
+                let managers = world.managers.filter(manager => !manager.unlocked && manager.seuil <= world.money)
+                //For each unlockable manager, check that at least 1 product of target is unlocked
+                managers = managers.filter(manager => (world.products.find(product => product.id === manager.idcible)?.quantite ?? 0 > 0))
+                return managers.length
             case GLOBALS.MAIN_MODALS.INVESTORS:
                 return Math.trunc(150 * Math.sqrt(world.score / Math.pow(10, 15)) - world.totalangels)
             default:

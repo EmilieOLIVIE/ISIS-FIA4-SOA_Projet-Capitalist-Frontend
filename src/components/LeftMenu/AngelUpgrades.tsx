@@ -43,7 +43,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
      * @param upgrade 
      */
     const buyAngelUpgrade = (upgrade: Palier) => {
-        if (world.money >= upgrade.seuil) {
+        if (world.activeangels >= upgrade.seuil) {
             let angelUpgrade = world.angelupgrades.find(element => element.name === upgrade.name)
             if (angelUpgrade) angelUpgrade.unlocked = true
             world.activeangels = world.activeangels - upgrade.seuil
@@ -59,6 +59,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
                 world.angelupgrades.filter(angelUpgrade => angelUpgrade.unlocked === showUnlocked).map(
                     angelUpgrade =>
                     (<ModalTemplate
+                        key={angelUpgrade.name}
                         palier={angelUpgrade}
                         typePalier={GLOBALS.MAIN_MODALS.ANGEL_UPGRADES}
                         nameCible={getTargetName(angelUpgrade)}
