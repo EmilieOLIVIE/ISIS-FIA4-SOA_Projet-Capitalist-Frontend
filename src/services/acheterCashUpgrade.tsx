@@ -4,12 +4,6 @@ const ACHETER_CASH_UPGRADE = gql`
 mutation acheterCashUpgrade($name: String!) {
   acheterCashUpgrade(name: $name) {
     name
-    logo
-    seuil
-    idcible
-    ratio
-    typeratio
-    unlocked
   }
 }
 `

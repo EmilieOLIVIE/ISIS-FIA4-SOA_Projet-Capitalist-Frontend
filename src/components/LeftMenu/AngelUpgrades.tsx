@@ -22,7 +22,6 @@ export default ({ world, username, updateWorld }: ModalProps) => {
         {
             context: { headers: { "x-user": username } },
             onError: (error) => toastError(error.message),
-            onCompleted: ({ acheterAngelUpgrade }) => buyAngelUpgrade(acheterAngelUpgrade)
         }
     )
 
@@ -43,6 +42,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
      * @param upgrade 
      */
     const buyAngelUpgrade = (upgrade: Palier) => {
+        acheterAngelUpgrade({ variables: { name: upgrade.name } })
         if (world.activeangels >= upgrade.seuil) {
             let angelUpgrade = world.angelupgrades.find(element => element.name === upgrade.name)
             if (angelUpgrade) angelUpgrade.unlocked = true
@@ -65,7 +65,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
                         nameCible={getTargetName(angelUpgrade)}
                         buyDisabled={world.activeangels < angelUpgrade.seuil}
                         hideBuyButton={showUnlocked}
-                        onClickBuy={() => acheterAngelUpgrade({ variables: { name: angelUpgrade.name } })}
+                        onClickBuy={() => buyAngelUpgrade(angelUpgrade)}
                     />)
                 )
             }

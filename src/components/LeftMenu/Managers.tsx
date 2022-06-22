@@ -22,7 +22,6 @@ export default ({ world, username, updateWorld }: ModalProps) => {
         {
             context: { headers: { "x-user": username } },
             onError: (error) => toastError(error.message),
-            onCompleted: ({ engagerManager }) => hireManager(engagerManager)
         }
     )
 
@@ -32,6 +31,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
      * @param manager 
      */
     const hireManager = (manager: Palier) => {
+        engagerManager({ variables: { name: manager.name } })
         if (world.money >= manager.seuil) {
             let newManager = world.managers.find(element => element.name === manager.name)
             if (newManager) newManager.unlocked = true
@@ -56,7 +56,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
                         typePalier={GLOBALS.MAIN_MODALS.MANAGERS}
                         buyDisabled={world.money < manager.seuil || world.products[manager.idcible - 1].quantite === 0}
                         hideBuyButton={showUnlocked}
-                        onClickBuy={() => engagerManager({ variables: { name: manager.name } })}
+                        onClickBuy={() => hireManager(manager)}
                     />)
 
                 )

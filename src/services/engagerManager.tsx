@@ -4,12 +4,6 @@ const ENGAGER_MANAGER = gql`
 mutation engagerManager($name: String!) {
   engagerManager(name: $name) {
     name
-    logo
-    seuil
-    idcible
-    ratio
-    typeratio
-    unlocked
   }
 }
 `
