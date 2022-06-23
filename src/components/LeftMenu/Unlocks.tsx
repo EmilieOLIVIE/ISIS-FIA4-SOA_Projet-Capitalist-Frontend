@@ -24,12 +24,22 @@ export default ({ world }: unlocksProps) => {
         let unlocks = []
         world.products
             .forEach(product => {
-                let palier = allPaliers.find(palier => palier.unlocked === showUnlocked && palier.idcible === product.id)
-                if (palier) unlocks.push(palier)
+                if (showUnlocked) {
+                    allPaliers.forEach(palier =>
+                        palier.unlocked && palier.idcible === product.id ? unlocks.push(palier) : null
+                    )
+                } else {
+                    let palier = allPaliers.find(palier => !palier.unlocked && palier.idcible === product.id)
+                    if (palier) unlocks.push(palier)
+                }
             }
             )
-        let allUnlock = world.allunlocks.find(unlock => !unlock.unlocked)
-        if (allUnlock) unlocks.push(allUnlock)
+        if (showUnlocked) {
+            world.allunlocks.forEach(unlock => unlock.unlocked ? unlocks.push(unlock) : null)
+        } else {
+            let allUnlock = world.allunlocks.find(unlock => !unlock.unlocked)
+            if (allUnlock) unlocks.push(allUnlock)
+        }
         return unlocks
     }
 
