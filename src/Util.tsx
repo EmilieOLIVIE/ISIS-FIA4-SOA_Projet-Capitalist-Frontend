@@ -11,7 +11,11 @@ export function transform(valeur: number): string {
         res = res.replace(/e\+(.*)/, " 10<sup>$1</sup>");
     }
     return res;
-};
+}
+
+export function numberWithSpaces(x: number) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
 
 export function getGeometricSequenceNTerm(a0: number, q: number, n: number): number {
     return a0 * Math.pow(q, n - 1)

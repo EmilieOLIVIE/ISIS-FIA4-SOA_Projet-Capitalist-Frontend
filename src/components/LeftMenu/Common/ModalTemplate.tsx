@@ -4,6 +4,7 @@ import { Palier } from "../../../world"
 
 import { ReactComponent as Coin } from '../../../assets/images/coin.svg'
 import { ReactComponent as Angel } from '../../../assets/images/angel.svg'
+import { numberWithSpaces } from "../../../Util"
 import GLOBALS from "../../../Globals"
 
 type ModalTemplateProps = {
@@ -42,8 +43,8 @@ export default ({ typePalier, palier, nameCible, buyDisabled, hideBuyButton, onC
                             {typePalier === GLOBALS.MAIN_MODALS.UNLOCKS ?
                                 <td>{palier.seuil}</td>
                                 : typePalier === GLOBALS.MAIN_MODALS.ANGEL_UPGRADES ?
-                                    <td><Angel className="coinIcon" /> {palier.seuil}</td>                                    
-                                    : <td><Coin className="coinIcon" /> {palier.seuil}</td>
+                                    <td><Angel className="coinIcon" /> {numberWithSpaces(palier.seuil)}</td>                                    
+                                    : <td><Coin className="coinIcon" /> {numberWithSpaces(palier.seuil)}</td>
 
                             }
                         </tr>

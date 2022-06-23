@@ -166,7 +166,11 @@ export default ({
         let nextLevelIndex = product.paliers.findIndex(palier => !palier.unlocked)
         if (nextLevelIndex === -1) return 100
         else if (nextLevelIndex === 0) return product.quantite * 100 / product.paliers[nextLevelIndex].seuil
-        else return product.paliers[nextLevelIndex].seuil - product.quantite * 100 / (product.paliers[nextLevelIndex].seuil - product.paliers[nextLevelIndex - 1].seuil)
+        else {
+            let qtReached = product.quantite - product.paliers[nextLevelIndex - 1].seuil
+            let qtToReach = product.paliers[nextLevelIndex].seuil - product.paliers[nextLevelIndex - 1].seuil
+            return qtReached * 100 / qtToReach
+        }
     }
 
     /**
@@ -191,8 +195,8 @@ export default ({
                         style={{ backgroundImage: `url(${GLOBALS.SERVER}${product.logo})`, backgroundSize: "100% 100%" }}
                         onClick={startProduction}
                     />
-                    <ProgressBar className="overlap" variant="warning" now={getProgressionToNextLevel()} label={product.quantite} />
-                </div>
+                    <span className="overlap nbOfProductsLabel">{product.quantite}</span>
+                    <ProgressBar className="overlap" variant="warning" now={getProgressionToNextLevel()} />                </div>
                 <div className='flex-grow-1'>
                     <Stack gap={2}>
                         <div className="progressBar">
@@ -206,9 +210,10 @@ export default ({
                                 auto={product.managerUnlocked}
                                 onCompleted={onProgressbarCompleted}
                             />
-                            <span className="overlap text-dark text-center">
-                                {transform(product.revenu * product.quantite * (1 + world.angelbonus * world.activeangels / 100))}
-                            </span>
+                            <span className="overlap text-dark text-center"
+                                dangerouslySetInnerHTML={{
+                                    __html: transform(product.revenu * product.quantite * (1 + world.angelbonus * world.activeangels / 100))
+                                }} />
                         </div>
                         <InputGroup style={{ width: 'inherit' }}>
                             <Button

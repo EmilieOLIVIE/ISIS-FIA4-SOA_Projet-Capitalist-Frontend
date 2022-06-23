@@ -8,7 +8,7 @@ import ModalTemplate from "./Common/ModalTemplate"
 import ModalNav from "./Common/ModalNav"
 import { ModalProps } from "../LeftMenu"
 
-import { customToast, formatPhrase, toastError, updateProduct } from "../../Util"
+import { formatPhrase, toastError, toastSuccess, updateProduct } from "../../Util"
 import GLOBALS from "../../Globals"
 
 export default ({ world, username, updateWorld }: ModalProps) => {
@@ -45,7 +45,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
                 let product = world.products.find(element => element.id === upgrade.idcible)
                 if(product) product = updateProduct(product, upgrade)
             }
-            customToast(formatPhrase(upgrade))
+            toastSuccess(formatPhrase(upgrade))
 
             updateWorld(world)
         }

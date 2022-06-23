@@ -59,3 +59,11 @@
     pointer-events: none;
     width: fit-content !important;
 }
+
+.nbOfProductsLabel {
+    width: inherit;
+    color: black;
+    text-align: center;
+    bottom: -17px;
+    z-index: 2;
+}
