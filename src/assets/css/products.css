@@ -44,6 +44,8 @@
 .progressBar .bar {
     width: inherit;
     height: inherit;
+}
+
 /*Override Boostrap ProgressBar CSS*/
 .progress-bar {
     color: black;

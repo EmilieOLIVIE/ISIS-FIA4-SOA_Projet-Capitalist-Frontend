@@ -1,5 +1,5 @@
 const GLOBALS = {
-    SERVER: 'http://localhost:4000/',
+    SERVER: 'https://soaprojetcapitalist.azurewebsites.net/',
     MULTIPLIER: ['x1', 'x10', 'Max', 'Next'],
     MAIN_MODALS: {
         UNLOCKS: 'Unlocks',
