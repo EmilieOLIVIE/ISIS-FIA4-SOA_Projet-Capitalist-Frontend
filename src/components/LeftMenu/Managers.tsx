@@ -39,7 +39,7 @@ export default ({ world, username, updateWorld }: ModalProps) => {
             if (newProduct) newProduct.managerUnlocked = true
             world.money = world.money - manager.seuil
             updateWorld(world)
-            toastSuccess(manager.name + ' unlocked successfully')
+            toastSuccess(manager.name + ' débloqué avec succès')
         }
     }
 
